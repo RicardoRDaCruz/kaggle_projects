@@ -11,7 +11,7 @@ import json
 def read_csv_to_dataframe(file_path):
     try:
         # Using pandas read_csv function to read the file into a DataFrame
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, sep=",")
         return df
     except FileNotFoundError:
         return "Error: The file at the provided path was not found."
@@ -52,6 +52,7 @@ def date_transformer(df, column):
 
 def adress_transformer(df,column):
     i=0
+    j=0
     while i<df.shape[0]:              
         if ',' in df.loc[i,column]:
             primeira_parte=df.loc[i,column].split(",")[1]     
@@ -59,6 +60,13 @@ def adress_transformer(df,column):
         else:
             df.loc[i,'Bairro']=df.loc[i,column].split("-")[0].strip()    
         i+=1
+    while j<df.shape[0]:              
+        if '-' in df.loc[j,column]:
+            primeira_parte=df.loc[j,column].split("-")[1]     
+            df.loc[j,'Cidade']=primeira_parte.split("/")[0].strip()  
+        else:
+            df.loc[j,'Cidade']=df.loc[j,column].split("/")[0].strip()    
+        j+=1
     return df
 
 def latlon_transformer(df, coluna):    
@@ -84,7 +92,7 @@ def mapa_pontos(df, map):
             print(i)
             folium.Marker(
             location=[df.loc[i,"Latitude"], df.loc[i,"Longitude"]],            
-            icon=folium.Icon(icon="cloud"),
+            #icon=folium.Icon(icon="cloud"),
             ).add_to(map)
         i+=1
 
@@ -164,9 +172,8 @@ def dataframe_anos(df,ano):
     
 
 def main():
-    arquivo1="SaoPaulo_OnlyAppartments_2024-11-25.csv"
-    dataframe=read_csv_to_dataframe(arquivo1)
-    
+    arquivo1="SaoPaulo.txt"
+    dataframe=read_csv_to_dataframe(arquivo1)    
     print(dataframe.columns)
     #dataframe=latlon_transformer(dataframe,'Adress')
     dataframe=date_transformer(dataframe, 'created_date') 
@@ -175,8 +182,8 @@ def main():
     change_data_types(dataframe,['Price','Area','Bedrooms','Bathrooms','Parking_Spaces'])      
     #dataframe.to_csv('SaoPaulo_OnlyAppartments_2024-11-25_TRATADO.csv', index=False)
     print(dataframe.dtypes)
-    print(dataframe.shape)     
-    Na_number(dataframe)
+    print(dataframe.shape)   
+    
     geojson_data1=''
     geojson_data2=''
     with open('SIRGAS_SHP_distrito.geojson') as f:
@@ -198,7 +205,10 @@ def main():
                     }).add_to(mapa)
     mapa_pontos(dataframe, mapa)
     mapa.save("mapa.html")
+    dataframe=dataframe.drop_duplicates()  
+    Na_number(dataframe)
     print(dataframe[['Price','Area','Bedrooms','Bathrooms','Parking_Spaces','Ano']].describe())
+    
     grafico_hist(dataframe,['Ano'],'Histograma para os Anos')
     grafico_hist(dataframe,['Price'],'Histograma para os Preços')   
     grafico_hist(dataframe,['Area'],'Histograma para a Área')
@@ -208,6 +218,10 @@ def main():
     grafico_hist(dataframe,['Bathrooms'],'Histograma para o número de Banheiros')
     grafico_hist(dataframe,['Parking_Spaces'],'Histograma para o número de vagas de estacionamento')    
     dataframe['contador']=1
+    dataframe2=dataframe[['contador','Cidade']].groupby('Cidade').sum().reset_index()
+    dataframe_cidades=dataframe2.sort_values('contador',ascending=False).head(50).reset_index()     
+    grafico_barrah(dataframe_cidades,['Cidade','contador'],"50 cidades com mais registros")
+    print(pd.crosstab(dataframe['Cidade'],dataframe['Ano']))   
     dataframe2=dataframe[['contador','Bairro']].groupby('Bairro').sum().reset_index()
     dataframe_bairros=dataframe2.sort_values('contador',ascending=False).head(50).reset_index()     
     grafico_barrah(dataframe_bairros,['Bairro','contador'],"50 bairros com mais registros")
