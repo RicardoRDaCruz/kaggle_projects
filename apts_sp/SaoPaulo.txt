@@ -20760,7 +20760,7 @@ ID,created_date,Price,below_price,Area,Adress,Bedrooms,Bathrooms,Parking_Spaces,
 2755188814,2018-03-28T23:01:01Z,1595000,false,140,"Rua Borba Gato , Santo Amaro - SÃ£o Paulo/SP",4,4,3,2024-11-25,-23.65751607702559,-46.69908781593971
 2752760725,2018-03-27T16:48:20Z,1900000,false,235,"Rua Diego de Castilho , Jardim Fonte do Morumbi - SÃ£o Paulo/SP",4,4,3,2024-11-25,,
 2753653840,2023-07-24T19:19:06Z,2300000,false,230,"Rua AntÃ´nio de Barros 3026, TatuapÃ© - SÃ£o Paulo/SP",4,6,3,2024-11-25,-23.53559558879686,-46.558447957649626
-2697382179,2018-03-27T18:36:36Z,2200000,false,156,"Rua Celso de Azevedo Marques 360. apto 102 - Verone, Parque da Mooca - SÃ£o Paulo/SP",4,5,3,2024-11-25,,
+2697382179,2018-03-27T18:36:36Z,2200000,false,156,"Rua Celso de Azevedo Marques 360. apto 102. Verone, Parque da Mooca - SÃ£o Paulo/SP",4,5,3,2024-11-25,,
 2731138939,2023-08-22T19:39:25Z,3450000,false,198,"Avenida Rouxinol , IndianÃ³polis - SÃ£o Paulo/SP",4,5,3,2024-11-25,-23.606769733226283,-46.66621005300596
 2758657863,2023-05-30T19:36:35Z,790000,false,170,"Rua General Eldes de Sousa Guedes , Jardim Colombo - SÃ£o Paulo/SP",4,5,3,2024-11-25,,
 2711795690,2020-12-21T19:55:13Z,1980000,false,147,"Rua Raul PompÃ©ia 930, Vila PompÃ©ia - SÃ£o Paulo/SP",4,4,3,2024-11-25,-23.5331072,-46.69018083655822

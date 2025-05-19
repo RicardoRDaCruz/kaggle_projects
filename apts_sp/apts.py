@@ -11,7 +11,7 @@ import json
 def read_csv_to_dataframe(file_path):
     try:
         # Using pandas read_csv function to read the file into a DataFrame
-        df = pd.read_csv(file_path, sep=",")
+        df = pd.read_csv(file_path, sep=",",encoding='utf_8')
         return df
     except FileNotFoundError:
         return "Error: The file at the provided path was not found."
@@ -71,12 +71,14 @@ def adress_transformer(df,column):
 
 def latlon_transformer(df, coluna):    
     i=0
-    while i<df.shape[0]:
-        print(i)
-        if type(df.loc[i,"Latitude"])!='numpy.float64':
+    while i<df.shape[0]:     
+        if (df.loc[i,"Latitude"]<0)==False:
+            print(i)
             endereco=df.loc[i,coluna]
-            loc=Nominatim(user_agent='Geopy Library')
-            get_loc=loc.geocode(endereco, timeout=12)
+            print(endereco)
+            loc=Nominatim(user_agent='ricardo.rc1997@gmail.com')
+            get_loc=loc.geocode(endereco, timeout=25)
+            print(get_loc)
             if get_loc != None:
                 print('substituiu')
                 df.loc[i,'Latitude']=get_loc.latitude
@@ -172,18 +174,30 @@ def dataframe_anos(df,ano):
     
 
 def main():
-    arquivo1="SaoPaulo.txt"
-    dataframe=read_csv_to_dataframe(arquivo1)    
+    arquivo1="SaoPaulo_OnlyAppartments_2024-11-25.csv"
+    arquivo2="SaoPaulo.csv"
+    dataframe=read_csv_to_dataframe(arquivo1)   
+    dataframe_corrigido=read_csv_to_dataframe(arquivo2)   
     print(dataframe.columns)
-    #dataframe=latlon_transformer(dataframe,'Adress')
+    print(dataframe.head(5))
+    dataframe=dataframe.drop_duplicates()  
+    dataframe=dataframe.reset_index()
+    ########
+    dataframe=latlon_transformer(dataframe,'Adress')
+    ########
     dataframe=date_transformer(dataframe, 'created_date') 
-    #dataframe=dataframe.drop(['ID','extract_date'], axis=1)  
+    ########
+    dataframe=dataframe.drop(['ID','extract_date'], axis=1)  
+    #########
     dataframe=adress_transformer(dataframe, 'Adress')   
-    change_data_types(dataframe,['Price','Area','Bedrooms','Bathrooms','Parking_Spaces'])      
-    #dataframe.to_csv('SaoPaulo_OnlyAppartments_2024-11-25_TRATADO.csv', index=False)
+    change_data_types(dataframe,['Price','Area','Bedrooms','Bathrooms','Parking_Spaces'])    
+    ########  
+    dataframe.to_csv('SaoPaulo.csv', index=False)
+    ########
     print(dataframe.dtypes)
-    print(dataframe.shape)   
-    
+    print(dataframe.shape)       
+    Na_number(dataframe)
+    Na_number(dataframe_corrigido)
     geojson_data1=''
     geojson_data2=''
     with open('SIRGAS_SHP_distrito.geojson') as f:
@@ -205,10 +219,8 @@ def main():
                     }).add_to(mapa)
     mapa_pontos(dataframe, mapa)
     mapa.save("mapa.html")
-    dataframe=dataframe.drop_duplicates()  
-    Na_number(dataframe)
-    print(dataframe[['Price','Area','Bedrooms','Bathrooms','Parking_Spaces','Ano']].describe())
     
+    print(dataframe[['Price','Area','Bedrooms','Bathrooms','Parking_Spaces','Ano']].describe())    
     grafico_hist(dataframe,['Ano'],'Histograma para os Anos')
     grafico_hist(dataframe,['Price'],'Histograma para os Preços')   
     grafico_hist(dataframe,['Area'],'Histograma para a Área')
@@ -221,7 +233,8 @@ def main():
     dataframe2=dataframe[['contador','Cidade']].groupby('Cidade').sum().reset_index()
     dataframe_cidades=dataframe2.sort_values('contador',ascending=False).head(50).reset_index()     
     grafico_barrah(dataframe_cidades,['Cidade','contador'],"50 cidades com mais registros")
-    print(pd.crosstab(dataframe['Cidade'],dataframe['Ano']))   
+    print(pd.crosstab(dataframe['Cidade'],dataframe['Ano']))  
+    dataframe2=dataframe2[dataframe2['Cidade']=='SÃ£o Paulo'] 
     dataframe2=dataframe[['contador','Bairro']].groupby('Bairro').sum().reset_index()
     dataframe_bairros=dataframe2.sort_values('contador',ascending=False).head(50).reset_index()     
     grafico_barrah(dataframe_bairros,['Bairro','contador'],"50 bairros com mais registros")
